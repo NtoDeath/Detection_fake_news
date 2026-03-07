@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Colab / Jupyter
+.ipynb_checkpoints/
+.virtual_envs/
+
+# Données et Modèles (Trop lourds pour GitHub)
+data/
+models/
+*.bin
+*.pt
+*.h5
+
+# Environnement
+.env
