@@ -8,11 +8,11 @@ __pycache__/
 .virtual_envs/
 
 # Données et Modèles (Trop lourds pour GitHub)
-data/
 models/
 *.bin
 *.pt
 *.h5
+*.csv
 
 # Environnement
 .env/

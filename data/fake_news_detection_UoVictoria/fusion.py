@@ -1,24 +1,26 @@
 import pandas as pd
 
-print("Chargement des fichiers Fake.csv et True.csv...")
+print("Loading Fake.csv and True.csv files...")
 df_fake = pd.read_csv("Fake.csv")
 df_true = pd.read_csv("True.csv")
 
-# ajout des labels
+# Add labels
 df_fake['label'] = 1
 df_true['label'] = 0
 
-df_complet = pd.concat([df_fake, df_true], axis=0)
-df_complet = df_complet.sample(frac=1, random_state=42).reset_index(drop=True)
+df_complete = pd.concat([df_fake, df_true], axis=0)
+df_complete = df_complete.sample(frac=1, random_state=42).reset_index(drop=True)
 
-# fusion Titre + Texte
-df_complet['texte_brut'] = df_complet['title'] + " " + df_complet['text']
+# Merge Title + Text
+df_complete['raw_text'] = df_complete['title'] + " " + df_complete['text']
 
-df_final = df_complet[['texte_brut', 'label']]
+df_final = df_complete[['raw_text', 'label']]
 
-df_final = df_final.rename(columns={'texte_brut': 'text'})
+df_final = df_final.rename(columns={'raw_text': 'text'})
+
+# Clean hidden tabs and newlines inside the text
 df_final['text'] = df_final['text'].replace(r'\n|\r|\t', ' ', regex=True)
 
-fichier_sortie = "dataset_pret.csv"
-df_final.to_csv(fichier_sortie, index=False, sep='\t')
-print(f"\nTERMINÉ ! Le dataset est prêt et sauvegardé sous : {fichier_sortie}")
+output_file = "dataset_ready.csv"
+df_final.to_csv(output_file, index=False, sep='\t')
+print(f"\nDONE! The dataset is ready and saved as: {output_file}")
