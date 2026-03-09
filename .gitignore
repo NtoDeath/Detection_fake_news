@@ -1,5 +1,7 @@
 # Python
 __pycache__/
+.DS_Store
+**/.DS_Store
 *.py[cod]
 *$py.class
 
@@ -13,6 +15,10 @@ models/
 *.pt
 *.h5
 *.csv
+roberta_fake_news/
+roberta_fake_news.zip
+roberta_fine_tunned/
+roberta_fine_tunned.zip
 
 # Environnement
 .env/

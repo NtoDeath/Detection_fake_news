@@ -1,6 +1,9 @@
 # Detection_fake_news
 Repo du projet NLP
 
+AVANT DE COMMENCER:
+2 choses à faire, récupérer les 2 zip sur Teams et les placer dans style_branch PUIS executer unzip.py (au cas ou avec "python unzip.py")
+
 organisation du projet:
 
 Le projet contient plusieurs branches:
