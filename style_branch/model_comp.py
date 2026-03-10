@@ -11,8 +11,8 @@ from sklearn.model_selection import RandomizedSearchCV
 from sklearn.metrics import classification_report, accuracy_score, roc_auc_score, f1_score, log_loss
 
 print("Loading data (Style + RoBERTa Semantics)...")
-df_train = pd.read_csv("../data/bloc_B_xgb_train_WITH_PROB.csv")
-df_test = pd.read_csv("../data/bloc_C_test_final_WITH_PROB.csv")
+df_train = pd.read_csv("../data/block_B_train_WITH_PROB.csv")
+df_test = pd.read_csv("../data/block_C_final_test_WITH_PROB.csv")
 
 columns_to_ignore = ['label', 'text']
 

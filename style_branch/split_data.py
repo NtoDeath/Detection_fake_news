@@ -20,7 +20,7 @@ df_xgb_train, df_final_test = train_test_split(
 
 print("\nData distribution:")
 print(f"Block A (RoBERTa Train) : {len(df_roberta_train)} rows")
-print(f"Block B (XGBoost Train) : {len(df_xgb_train)} rows")
+print(f"Block B (Training) : {len(df_xgb_train)} rows")
 print(f"Block C (Final Test)    : {len(df_final_test)} rows")
 
 print("\nSanity Check - Class Distribution (Fake=1, True=0):")
@@ -29,7 +29,7 @@ print(f"Block B: \n{df_xgb_train['label'].value_counts(normalize=True).round(3)}
 print(f"Block C: \n{df_final_test['label'].value_counts(normalize=True).round(3)}")
 
 df_roberta_train.to_csv("../data/block_A_roberta_train.csv", index=False)
-df_xgb_train.to_csv("../data/block_B_xgb_train.csv", index=False)
+df_xgb_train.to_csv("../data/block_B_train.csv", index=False)
 df_final_test.to_csv("../data/block_C_final_test.csv", index=False)
 
 print("\nSplitting complete and files saved!")

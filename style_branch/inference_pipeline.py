@@ -54,6 +54,7 @@ class FakeNewsDetector:
                 df_inference[col] = 0.0
                 
         df_inference = df_inference[self.expected_columns]
+        # print(df_inference.head(1)) # can be needed for test (columns junctions)
         
         prediction = self.rf_judge.predict(df_inference)[0]
         final_proba = self.rf_judge.predict_proba(df_inference)[0]

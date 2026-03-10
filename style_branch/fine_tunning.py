@@ -20,7 +20,7 @@ else:
 
 print("Loading CSV files...")
 df_A = pd.read_csv("../data/block_A_roberta_train.csv")
-df_B = pd.read_csv("../data/block_B_xgb_train.csv")
+df_B = pd.read_csv("../data/block_B_train.csv")
 df_C = pd.read_csv("../data/block_C_final_test.csv")
 
 dataset_A = Dataset.from_pandas(df_A[['text', 'label']])
@@ -94,7 +94,7 @@ fake_proba_C = softmax(predictions_C.predictions, axis=1)[:, 1]
 df_B['roberta_proba'] = fake_proba_B
 df_C['roberta_proba'] = fake_proba_C
 
-df_B.to_csv("../data/block_B_xgb_train_WITH_PROB.csv", index=False)
+df_B.to_csv("../data/block_B_train_WITH_PROB.csv", index=False)
 df_C.to_csv("../data/block_C_final_test_WITH_PROB.csv", index=False)
 
 print("\nBlocks B and C have been enriched with RoBERTa's opinion.")
