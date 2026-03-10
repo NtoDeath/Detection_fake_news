@@ -15,6 +15,7 @@ models/
 *.pt
 *.h5
 *.csv
+*.tsv
 roberta_fake_news/
 roberta_fake_news.zip
 roberta_fine_tunned/
