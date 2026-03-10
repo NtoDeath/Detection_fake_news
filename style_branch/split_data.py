@@ -1,30 +1,35 @@
 import pandas as pd
 from sklearn.model_selection import train_test_split
 
-print("Chargement du dataset complet (Style + Texte)...")
-df_complet = pd.read_csv("../data/train_complet.csv")
+print("Loading the complete dataset (Style + Text)...")
+df_complete = pd.read_csv("../data/complete_train.csv")
 
-df_roberta_train, df_reste = train_test_split(
-    df_complet, 
+df_roberta_train, df_remainder = train_test_split(
+    df_complete, 
     test_size=0.40, 
     random_state=42, 
-    stratify=df_complet['label'] #  on veut autant de vrais que de faux partout
+    stratify=df_complete['label'] # We want as many real as fake news everywhere
 )
 
-df_xgb_train, df_test_final = train_test_split(
-    df_reste, 
+df_xgb_train, df_final_test = train_test_split(
+    df_remainder, 
     test_size=0.50, 
     random_state=42, 
-    stratify=df_reste['label']
+    stratify=df_remainder['label']
 )
 
-print("\nRépartition des données :")
-print(f"Bloc A (RoBERTa Train) : {len(df_roberta_train)} lignes")
-print(f"Bloc B (XGBoost Train) : {len(df_xgb_train)} lignes")
-print(f"Bloc C (Test Final)    : {len(df_test_final)} lignes")
+print("\nData distribution:")
+print(f"Block A (RoBERTa Train) : {len(df_roberta_train)} rows")
+print(f"Block B (XGBoost Train) : {len(df_xgb_train)} rows")
+print(f"Block C (Final Test)    : {len(df_final_test)} rows")
 
-df_roberta_train.to_csv("../data/bloc_A_roberta_train.csv", index=False)
-df_xgb_train.to_csv("../data/bloc_B_xgb_train.csv", index=False)
-df_test_final.to_csv("../data/bloc_C_test_final.csv", index=False)
+print("\nSanity Check - Class Distribution (Fake=1, True=0):")
+print(f"Block A: \n{df_roberta_train['label'].value_counts(normalize=True).round(3)}")
+print(f"Block B: \n{df_xgb_train['label'].value_counts(normalize=True).round(3)}")
+print(f"Block C: \n{df_final_test['label'].value_counts(normalize=True).round(3)}")
 
-print("\nDécoupage terminé et fichiers sauvegardés !")
+df_roberta_train.to_csv("../data/block_A_roberta_train.csv", index=False)
+df_xgb_train.to_csv("../data/block_B_xgb_train.csv", index=False)
+df_final_test.to_csv("../data/block_C_final_test.csv", index=False)
+
+print("\nSplitting complete and files saved!")

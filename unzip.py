@@ -3,38 +3,43 @@ import shutil
 import os
 from pathlib import Path
 
-SUPPRIMER_ZIP_APRES_EXTRACTION = False
+DELETE_ZIP_AFTER_EXTRACTION = False
 
-dossier_racine = Path('.')
+root_folder = Path('.')
 
-fichiers_zip = list(dossier_racine.rglob('*.zip'))
+zip_files = list(root_folder.rglob('*.zip'))
 
-if not fichiers_zip:
-    print("Aucun fichier .zip n'a été trouvé dans le projet.")
+if not zip_files:
+    print("No .zip files found in the project.")
 else:
-    print(f"{len(fichiers_zip)} archive(s) trouvée(s). Début de l'extraction...\n")
+    print(f"{len(zip_files)} archive(s) found. Starting extraction...\n")
 
-    for chemin_zip in fichiers_zip:
-        dossier_cible = chemin_zip.parent 
+    for zip_path in zip_files:
+        target_folder = zip_path.parent 
+        
+        extraction_marker = target_folder / zip_path.stem
+        if extraction_marker.exists():
+            print(f"Skipping '{zip_path.name}', already extracted at '{extraction_marker}/'.")
+            continue
 
-        print(f"Extraction de '{chemin_zip.name}' directement dans '{dossier_cible}/'...")
+        print(f"Extracting '{zip_path.name}' directly into '{target_folder}/'...")
         
         try:
-            with zipfile.ZipFile(chemin_zip, 'r') as archive:
-                archive.extractall(path=dossier_cible)
+            with zipfile.ZipFile(zip_path, 'r') as archive:
+                archive.extractall(path=target_folder)
             
-            # --- NETTOYAGE MAC ---
-            dossier_macosx = dossier_cible / "__MACOSX"
-            if dossier_macosx.exists() and dossier_macosx.is_dir():
-                shutil.rmtree(dossier_macosx)
+            # --- MAC CLEANUP ---
+            macosx_folder = target_folder / "__MACOSX"
+            if macosx_folder.exists() and macosx_folder.is_dir():
+                shutil.rmtree(macosx_folder)
                 
-            print(f"Succès pour {chemin_zip.name} !")
+            print(f"Success for {zip_path.name}!")
             
-            if SUPPRIMER_ZIP_APRES_EXTRACTION:
-                os.remove(chemin_zip)
-                print(f"Le fichier {chemin_zip.name} a été supprimé pour libérer de l'espace.")
+            if DELETE_ZIP_AFTER_EXTRACTION:
+                os.remove(zip_path)
+                print(f"The file {zip_path.name} has been deleted to free up space.")
                 
         except zipfile.BadZipFile:
-            print(f"Erreur : Le fichier {chemin_zip.name} est corrompu ou n'est pas une archive valide.")
+            print(f"Error: The file {zip_path.name} is corrupted or not a valid archive.")
 
-print("\nToutes les zip sont décompressées.")
+print("\nAll zip files are decompressed.")

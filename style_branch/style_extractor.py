@@ -16,7 +16,6 @@ from tqdm import tqdm
 
 class StyleExtractor(BaseEstimator, TransformerMixin):
     def __init__(self):
-        # Load heavy models only once upon object creation
         print("Loading linguistic models...")
         self.nlp_fr = spacy.load("fr_core_news_sm")
         self.nlp_en = spacy.load("en_core_web_sm")
@@ -58,29 +57,33 @@ class StyleExtractor(BaseEstimator, TransformerMixin):
         hashtag_list = re.findall(r'#\w+', raw_text)
         
         # Clean tags to avoid false spelling mistakes
-        raw_text = re.sub(r'\s*\[(?:MENTION|URL|NB)\]\s*', ' ', raw_text)
-        raw_text = raw_text.replace('#', '').strip()
+        raw_text_clean = re.sub(r'\s*\[(?:MENTION|URL|NB)\]\s*', ' ', raw_text)
+        raw_text_clean = raw_text_clean.replace('#', '').strip()
         
-        metrics['total_characters'] = len(raw_text)
-        num_letters = sum(1 for c in raw_text if c.isalpha())
-        num_uppercase = sum(1 for c in raw_text if c.isupper())
+        metrics['total_characters'] = len(raw_text_clean)
+        num_letters = sum(1 for c in raw_text_clean if c.isalpha())
+        num_uppercase = sum(1 for c in raw_text_clean if c.isupper())
         
         metrics['uppercase_ratio'] = num_uppercase / num_letters if num_letters > 0 else 0
         
-        num_exclamations = raw_text.count('!')
-        num_questions = raw_text.count('?')
-        metrics['aggressive_punct_density'] = (num_exclamations + num_questions) / len(raw_text) if len(raw_text) > 0 else 0
+        words = raw_text_clean.split()
+        num_fully_uppercase_words = sum(1 for word in words if word.isupper() and len(word) > 1)
+        metrics['fully_uppercase_words_ratio'] = num_fully_uppercase_words / len(words) if len(words) > 0 else 0
+
+        num_exclamations = raw_text_clean.count('!')
+        num_questions = raw_text_clean.count('?')
+        metrics['aggressive_punctuation_density'] = (num_exclamations + num_questions) / len(raw_text_clean) if len(raw_text_clean) > 0 else 0
 
         try:
-            language = detect(raw_text)
+            language = detect(raw_text_clean)
         except:
             language = 'en'
             
         if language == 'fr':
-            doc = self.nlp_fr(raw_text)
+            doc = self.nlp_fr(raw_text_clean)
             emoji_language = 'fr'
         else:
-            doc = self.nlp_en(raw_text)
+            doc = self.nlp_en(raw_text_clean)
             emoji_language = 'en'
         
         # Filter to keep only real words (exclude punctuation and spaces)
@@ -91,8 +94,8 @@ class StyleExtractor(BaseEstimator, TransformerMixin):
         if num_words == 0:
             return metrics
 
-        metrics['num_words'] = num_words
-        metrics['num_sentences'] = num_sentences
+        metrics['word_count'] = num_words
+        metrics['sentence_count'] = num_sentences
 
         unique_words = set([token.text.lower() for token in real_words])
         metrics['lexical_richness'] = len(unique_words) / num_words
@@ -107,8 +110,8 @@ class StyleExtractor(BaseEstimator, TransformerMixin):
         metrics['adverb_ratio'] = sum(1 for token in real_words if token.pos_ == "ADV") / num_words
         metrics['verb_ratio'] = sum(1 for token in real_words if token.pos_ == "VERB") / num_words
         
-        metrics['num_hashtags'] = len(hashtag_list)
-        metrics['num_emojis'] = emoji.emoji_count(raw_text)
+        metrics['hashtag_count'] = len(hashtag_list)
+        metrics['emoji_count'] = emoji.emoji_count(raw_text)
 
         # Spell checking (ignoring proper nouns)
         words_to_check = [token.text.lower() for token in real_words if token.pos_ != "PROPN"]
@@ -120,7 +123,7 @@ class StyleExtractor(BaseEstimator, TransformerMixin):
             
         metrics['spelling_mistake_ratio'] = len(spelling_mistakes) / num_words if num_words > 0 else 0
 
-        text_emojis_words = emoji.demojize(raw_text, language=emoji_language)
+        text_emojis_words = emoji.demojize(raw_text_clean, language=emoji_language)
         text_emojis_words = re.sub(r':([^\s:]+):', r'\1', text_emojis_words)
         text_emojis_words = text_emojis_words.replace('_', ' ')
         
@@ -136,8 +139,7 @@ class StyleExtractor(BaseEstimator, TransformerMixin):
 
         return metrics
 
-
-def transform(self, X, y=None):
+    def transform(self, X, y=None):
         features = []
         for text in tqdm(X, desc="Extracting Style Metrics"):
             clean_text = self._normalize_text(text)
@@ -145,5 +147,7 @@ def transform(self, X, y=None):
             features.append(vector)
 
         df_features = pd.DataFrame(features)
+        
+        df_features = df_features.dropna(axis=1, how='all')
         
         return df_features.fillna(0)
