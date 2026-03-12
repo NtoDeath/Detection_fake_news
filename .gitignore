@@ -24,3 +24,4 @@ roberta_fine_tunned.zip
 # Environnement
 .env/
 venv/
+.venv/
