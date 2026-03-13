@@ -95,7 +95,9 @@ df_B['roberta_proba'] = fake_proba_B
 df_C['roberta_proba'] = fake_proba_C
 
 df_B.to_csv("../data/block_B_train_WITH_PROB.csv", index=False)
+os.remove("../data/block_B_train.csv")
 df_C.to_csv("../data/block_C_final_test_WITH_PROB.csv", index=False)
+os.remove("../data/block_C_final_test.csv")
 
 print("\nBlocks B and C have been enriched with RoBERTa's opinion.")
 

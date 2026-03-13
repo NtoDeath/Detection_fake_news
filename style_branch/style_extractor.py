@@ -52,7 +52,7 @@ class StyleExtractor(BaseEstimator, TransformerMixin):
         metrics['has_hashtags'] = len(re.findall(r'#\w+', raw_text)) > 0
         metrics['has_mentions'] = len(re.findall(r'\[MENTION\]', raw_text)) > 0
         metrics['has_urls'] = len(re.findall(r'\[URL\]', raw_text)) > 0
-        metrics['has_numbers'] = len(re.findall(r'\[NB\]', raw_text)) > 0
+        metrics['has_numbers'] = len(re.findall(r'\[NB\]', raw_text)) > 0 # pbl ici
         
         hashtag_list = re.findall(r'#\w+', raw_text)
         

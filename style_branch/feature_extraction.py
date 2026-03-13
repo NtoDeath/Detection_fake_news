@@ -5,14 +5,14 @@ from tqdm import tqdm
 
 from style_extractor import StyleExtractor
 
-input_file = "../data/fake_news_detection_UoVictoria/dataset_ready.csv"
+input_file = "../data/dataset.csv"
 
 if not os.path.exists(input_file):
     print(f"CRITICAL ERROR: Cannot find {input_file}. Are you running the script from the right directory?")
     sys.exit(1)
 
 print(f"Loading data from {input_file}...")
-df = pd.read_csv(input_file, sep='\t')
+df = pd.read_csv(input_file)
 
 # Prevent the script from crashing if text cells are empty (NaN)
 text_column = 'text'

@@ -12,12 +12,16 @@ class FakeNewsDetector:
     Style Extractor + RoBERTa -> Random Forest
     """
     
-    def __init__(self, roberta_path="./roberta_fine_tunned", rf_path="best_model_random_forest.pkl"):
+    def __init__(self, roberta_path="./roberta_fine_tunned", rf_path="./results/best_model.pkl"):
         print("Initializing Detector (Loading into RAM...)")
         
-        if not os.path.exists(roberta_path) or not os.path.exists(rf_path):
+        if not os.path.exists(roberta_path):
             raise FileNotFoundError(
-                f"Missing model files! Ensure both '{roberta_path}' and '{rf_path}' exist."
+                f"Missing model files! Ensure '{roberta_path}' exists."
+            )
+        if not os.path.exists(rf_path):
+            raise FileNotFoundError(
+                f"Missing model files! Ensure '{rf_path}' exists."
             )
 
         self.tokenizer = AutoTokenizer.from_pretrained(roberta_path)
@@ -25,14 +29,14 @@ class FakeNewsDetector:
         
         self.rf_judge = joblib.load(rf_path)
         self.expected_columns = self.rf_judge.feature_names_in_
+        self.style_extractor = StyleExtractor()
         
         print("Detector is ready and loaded in memory!")
 
     def _calculate_style(self, text):
         """Private method to compute style metrics"""
-        extractor = StyleExtractor()
-        clean_text = extractor._normalize_text(text)
-        return extractor._extract_metrics(clean_text)
+        clean_text = self.style_extractor._normalize_text(text)
+        return self.style_extractor._extract_metrics(clean_text)
 
     def analyze(self, text):
         """Public method to be called by your future website"""

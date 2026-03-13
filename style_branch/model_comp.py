@@ -132,15 +132,15 @@ print("Detailed report of the best model:")
 report = classification_report(y_test, winner_predictions)
 print(report)
 
-model_filename = f"best_model_{winner_name.lower().replace(' ', '_')}.pkl"
-joblib.dump(winner, model_filename)
+model_filename = f"best_model.pkl"
+joblib.dump(winner, f"results/{model_filename}")
 print(f"The best model has been saved as: {model_filename}")
 
 report_filename = f"report_{winner_name.lower().replace(' ', '_')}.txt"
-with open(report_filename, "w") as f:
+with open(f"results/{report_filename}", "w") as f:
     f.write(f"Model: {winner_name}\n")
     f.write(report)
-print(f"Performance report saved to: {report_filename}")
+print(f"Performance report saved to: results/{report_filename}")
 
 importances = winner.feature_importances_
 feature_names = X_train.columns
@@ -156,5 +156,5 @@ plt.ylabel("Features")
 plt.tight_layout()
 
 image_filename = f"feature_weights_{winner_name.lower().replace(' ', '_')}.png"
-plt.savefig(image_filename)
-print(f"Graph generated: {image_filename}")
+plt.savefig(f"results/{image_filename}")
+print(f"Graph generated: results/{image_filename}")
