@@ -20,9 +20,7 @@ Data LIAR kaggle : https://www.kaggle.com/datasets/doanquanvietnamca/liar-datase
 
 
 TODO :
-    - style based :
-        Besoin de refaire un fine-tuning et apprentissage
-        Besoin de faire une architecture plus propre pour le projet (data et style_branch)
+
 
 ## Arborescence du repertoire
 
