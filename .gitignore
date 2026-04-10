@@ -30,6 +30,7 @@ venv/
 knowledge_branch/results/
 knowledge_branch/my_claim_model/
 knowledge_branch/claim_detector_model/
+knowledge_branch/claim_detector_results/
 knowledge_branch/train.jsonl
 *.safetensors
 style_branch/roberta_fine_tunned/

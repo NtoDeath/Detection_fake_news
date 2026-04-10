@@ -1,9 +1,9 @@
 Model: Random Forest
               precision    recall  f1-score   support
 
-           0       0.90      0.95      0.92      6173
-           1       0.95      0.90      0.92      6162
+           0       0.91      0.94      0.93      6173
+           1       0.94      0.91      0.92      6162
 
-    accuracy                           0.92     12335
-   macro avg       0.92      0.92      0.92     12335
-weighted avg       0.92      0.92      0.92     12335
+    accuracy                           0.93     12335
+   macro avg       0.93      0.93      0.93     12335
+weighted avg       0.93      0.93      0.93     12335
