@@ -25,3 +25,13 @@ roberta_fine_tunned.zip
 .env/
 venv/
 .venv/
+
+# Résultats d'entraînement et modèles (fichiers lourds)
+knowledge_branch/results/
+knowledge_branch/my_claim_model/
+knowledge_branch/claim_detector_model/
+knowledge_branch/train.jsonl
+*.safetensors
+style_branch/roberta_fine_tunned/
+*.zip
+data/knowledge_based/train.jsonl
