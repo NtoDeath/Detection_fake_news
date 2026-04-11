@@ -1,6 +1,6 @@
 """
 Entraînement du Claim Detector
-- Chargement du dataset groundtruth.csv (100%)
+- Chargement du dataset groundtruth_partA.csv (80% Part A)
 - Fine-tuning d'un DistilBERT pour la détection de claims
 - Sauvegarde du modèle
 """
@@ -25,14 +25,14 @@ PROJECT_ROOT = Path.home() / "Documents/IFT714 Traitement des LN/Projet/Detectio
 KNOWLEDGE_BRANCH = PROJECT_ROOT / "knowledge_branch"
 
 def load_groundtruth_dataset():
-    """Charge et prépare le dataset groundtruth.csv (100%)"""
-    print("📂 Chargement du dataset groundtruth.csv (100%)...")
+    """Charge et prépare le dataset groundtruth_partA.csv (80% Part A)"""
+    print("📂 Chargement du dataset groundtruth_partA.csv (80% Part A)...")
     
-    groundtruth_file = KNOWLEDGE_BRANCH / "groundtruth.csv"
+    groundtruth_file = KNOWLEDGE_BRANCH / "splits" / "groundtruth_partA.csv"
     
     if not groundtruth_file.exists():
         print(f"❌ Fichier non trouvé : {groundtruth_file}")
-        print("   Exécutez d'abord : python data_extraction.py")
+        print("   Exécutez d'abord : python prepare_part_B_heterogeneous.py")
         return None
     
     dataset = pd.read_csv(groundtruth_file)
@@ -208,7 +208,7 @@ def test_claim_detector():
 def main():
     """Fonction principale : orchestre tout le pipeline"""
     print("=" * 60)
-    print("🚀 TRAINING CLAIM DETECTOR (100%)")
+    print("🚀 TRAINING CLAIM DETECTOR (80% Part A)")
     print("=" * 60)
     print()
     

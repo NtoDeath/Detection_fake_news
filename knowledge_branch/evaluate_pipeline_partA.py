@@ -1,6 +1,6 @@
 """
-Évaluation complète du Pipeline Knowledge-based (100%)
-- Chargement du dataset FEVER
+Évaluation complète du Pipeline Knowledge-based (80% Part A)
+- Chargement du dataset FEVER train_partA.jsonl
 - Évaluation de la récupération de preuves
 - Évaluation de la vérification des claims
 - Génération des métriques et rapports
@@ -29,14 +29,14 @@ if str(KNOWLEDGE_BRANCH) not in sys.path:
     sys.path.insert(0, str(KNOWLEDGE_BRANCH))
 
 def load_fever_dataset():
-    """Charge et prépare le dataset FEVER (100%)"""
-    print("📂 Chargement du dataset FEVER (100%)...")
+    """Charge et prépare le dataset FEVER (80% Part A)"""
+    print("📂 Chargement du dataset FEVER train_partA.jsonl (80% Part A)...")
     
-    fever_file = DATA_DIR / 'train.jsonl'
+    fever_file = KNOWLEDGE_BRANCH / 'splits' / 'train_partA.jsonl'
     
     if not fever_file.exists():
         print(f"   ❌ Fichier non trouvé : {fever_file}")
-        print("   Exécutez d'abord : python data_extraction.py")
+        print("   Exécutez d'abord : python prepare_part_B_heterogeneous.py")
         return None
     
     df_fever = pd.read_json(str(fever_file), lines=True)
@@ -138,7 +138,7 @@ def evaluate_verification(verifier, retriever, test_set):
     
     # Calcul des métriques
     print("\n" + "=" * 50)
-    print("📊 RÉSULTATS DE L'ÉVALUATION (100%)")
+    print("📊 RÉSULTATS DE L'ÉVALUATION (80% Part A)")
     print("=" * 50)
     
     print(f"\n📈 Taux de récupération : {retrieval_success}/{len(test_set)} ({100*retrieval_success/len(test_set):.1f}%)")
@@ -168,11 +168,11 @@ def plot_confusion_matrix(cm, labels):
     )
     plt.ylabel('Vrai Label')
     plt.xlabel('Prédiction')
-    plt.title('Matrice de Confusion - Pipeline Knowledge-based (100%)')
+    plt.title('Matrice de Confusion - Pipeline Knowledge-based (80% Part A)')
     plt.tight_layout()
     
     # Sauvegarder
-    output_file = KNOWLEDGE_BRANCH / "results" / "confusion_matrix.png"
+    output_file = KNOWLEDGE_BRANCH / "results" / "confusion_matrix_partA.png"
     output_file.parent.mkdir(parents=True, exist_ok=True)
     plt.savefig(output_file, dpi=300, bbox_inches='tight')
     print(f"   ✅ Sauvegardée : {output_file}")
@@ -182,12 +182,12 @@ def generate_report(y_true, y_pred, cm, labels_order, retrieval_stats):
     """Génère un rapport d'évaluation complet"""
     print("\n📝 Génération du rapport d'évaluation...")
     
-    report_file = KNOWLEDGE_BRANCH / "results" / "evaluation_report.txt"
+    report_file = KNOWLEDGE_BRANCH / "results" / "evaluation_report_partA.txt"
     report_file.parent.mkdir(parents=True, exist_ok=True)
     
     with open(report_file, 'w', encoding='utf-8') as f:
         f.write("=" * 70 + "\n")
-        f.write("RAPPORT D'ÉVALUATION - PIPELINE KNOWLEDGE-BASED (100%)\n")
+        f.write("RAPPORT D'ÉVALUATION - PIPELINE KNOWLEDGE-BASED (80% Part A)\n")
         f.write("=" * 70 + "\n\n")
         
         # Résumé général
@@ -236,7 +236,7 @@ def generate_report(y_true, y_pred, cm, labels_order, retrieval_stats):
 def main():
     """Fonction principale : orchestre l'évaluation complète"""
     print("=" * 70)
-    print("🚀 EVALUATION - KNOWLEDGE BRANCH PIPELINE (100%)")
+    print("🚀 EVALUATION - KNOWLEDGE BRANCH PIPELINE (80% Part A)")
     print("=" * 70)
     print()
     

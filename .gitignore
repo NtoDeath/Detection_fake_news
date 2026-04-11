@@ -32,7 +32,9 @@ knowledge_branch/my_claim_model/
 knowledge_branch/claim_detector_model/
 knowledge_branch/claim_detector_results/
 knowledge_branch/train.jsonl
+knowledge_branch/splits/
 *.safetensors
 style_branch/roberta_fine_tunned/
 *.zip
 data/knowledge_based/train.jsonl
+data/splits/
