@@ -20,6 +20,10 @@ from transformers import (
 import torch
 from sklearn.metrics import classification_report, confusion_matrix
 
+# Import GPU utilities for device detection
+sys.path.insert(0, str(Path.home() / "Documents/IFT714 Traitement des LN/Projet/Detection_fake_news"))
+from gpu_utils import setup_training_device, print_device_info
+
 # Configuration des paths
 PROJECT_ROOT = Path.home() / "Documents/IFT714 Traitement des LN/Projet/Detection_fake_news"
 KNOWLEDGE_BRANCH = PROJECT_ROOT / "knowledge_branch"
@@ -77,8 +81,11 @@ def tokenize_function(examples, tokenizer):
 
 def train_claim_detector(split_dataset):
     """Fine-tune un DistilBERT pour la détection de claims"""
-    print("🤖 Fine-tuning du Claim Detector...")
-    print("   Device : CPU (pour éviter les problèmes de mémoire GPU)\n")
+    print("🤖 Fine-tuning du Claim Detector (Part A)...")
+    
+    # Display device configuration
+    device = setup_training_device(verbose=False)
+    print_device_info("📍 Training Device Configuration")
     
     model_checkpoint = "distilbert-base-uncased"
     tokenizer = AutoTokenizer.from_pretrained(model_checkpoint)
@@ -178,7 +185,7 @@ def test_claim_detector():
         "text-classification",
         model=str(model_dir),
         tokenizer=str(model_dir),
-        device=0 if torch.cuda.is_available() else -1
+        device=0 if torch.cuda.is_available() or setup_training_device(verbose=False).type == 'cuda' else -1
     )
     
     def detect_claim(text, threshold=0.2):

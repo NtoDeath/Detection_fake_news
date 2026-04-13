@@ -85,9 +85,6 @@ if __name__ == "__main__":
     # Demo: test with clearly fake news (should have high 'fake_proba')
     analyze_sentence("BREAKING: Alien spaceship found hidden under the White House! The government is lying to us!!!")
     
-    # Interactive loop: user input until quit
-    while True:
-        user_input: str = input("\nEnter a sentence to test (or 'q' to quit): ")
-        if user_input.lower() in ['q', 'quit']:
-            break
-        analyze_sentence(user_input)
+    print("\n" + "="*70)
+    print("✅ Model test completed successfully!")
+    print("="*70)

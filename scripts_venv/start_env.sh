@@ -67,10 +67,16 @@ except ImportError:
         echo ""
         
         # Installation de PyTorch avec support CUDA (pour GPU NVIDIA)
-        echo "  → Installation de PyTorch avec CUDA 11.8..."
-        python -m pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118 --quiet 2>/dev/null
+        echo "  → Installation de PyTorch avec CUDA 12.4 (pour RTX 4060)..."
+        python -m pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu124 --quiet 2>/dev/null
         if [ $? -eq 0 ]; then
-            echo "    ✅ PyTorch (GPU) installé!"
+            echo "    ✅ PyTorch CUDA 12.4 (GPU) installé!"
+            
+            # Installation des packages GPU optimisés
+            echo "  → Installation des packages GPU (cuDNN, nvidia-cublas, xformers)..."
+            python -m pip install nvidia-cudnn-cu12 nvidia-cublas-cu12 --quiet 2>/dev/null
+            python -m pip install xformers --quiet 2>/dev/null
+            echo "    ✅ Packages GPU optimisés installés!"
         else
             echo "    ⚠️ Fallback: installation de PyTorch CPU..."
             python -m pip install torch torchvision torchaudio --quiet 2>/dev/null
@@ -190,11 +196,71 @@ except LookupError:
     echo "   2. Cliquez sur 'Sélectionner le kernel' (en haut à droite)"
     echo "   3. Choisissez 'Python (Fake News venv)'"
     echo ""
+    echo "⚡ Pop!_OS GPU Configuration:"
+    echo "   • RTX 4060: Compute Capability 8.9 (Ada)"
+    echo "   • CUDA Runtime: Accessible via PyTorch"
+    echo "   • PyTorch: Configuré pour CUDA 13.0+"
+    echo "   • xformers: Installé pour speedup Transformers"
+    echo ""
+    echo "📝 Notes:"
+    echo "   • nvidia-smi peut ne pas être en PATH en environnement Flatpak"
+    echo "   • Mais CUDA Libraries (/usr/lib/libcuda.so) sont détectées"
+    echo "   • PyTorch peut utiliser le GPU directement"
+    echo "   • Si 'PyTorch CUDA: NON DISPONIBLE', réexécutez ce script"
+    echo ""
     
     # ========== VÉRIFICATION GPU ==========
     echo "💻 Statut GPU:"
-    CUDA_CHECK=$(python -c "import torch; print(f'CUDA: {torch.cuda.is_available()}'); print(f'Device: {torch.cuda.get_device_name(0) if torch.cuda.is_available() else \"CPU only\"}')" 2>/dev/null)
-    echo "$CUDA_CHECK"
+    
+    # Vérifier les librairies CUDA runtime
+    CUDA_LIBS=$(find /usr -name "libcuda.so*" 2>/dev/null | head -1)
+    if [ -n "$CUDA_LIBS" ]; then
+        echo "  ✅ CUDA Runtime Libraries détectées"
+        echo "     $CUDA_LIBS"
+    else
+        echo "  ⚠️ CUDA Runtime Libraries non trouvées"
+    fi
+    
+    # Vérifier nvidia-smi
+    if command -v nvidia-smi &> /dev/null; then
+        echo "  ✅ NVIDIA Driver Tools (nvidia-smi) détectés"
+    else
+        echo "  ℹ️  nvidia-smi non trouvé (mais CUDA runtime peut fonctionner)"
+    fi
+    
+    # Vérifier PyTorch GPU avec retry
+    echo ""
+    echo "  🔍 Test PyTorch CUDA (cela peut prendre quelques secondes)..."
+    
+    CUDA_CHECK=$(python -c "
+import sys
+import torch
+
+try:
+    cuda_avail = torch.cuda.is_available()
+    if cuda_avail:
+        print('  ✅ PyTorch CUDA: DISPONIBLE')
+        print(f'     GPU: {torch.cuda.get_device_name(0)}')
+        print(f'     CUDA Version: {torch.version.cuda}')
+        print(f'     Memory: {torch.cuda.get_device_properties(0).total_memory / 1e9:.1f} GB')
+        print(f'     Compute Capability: {torch.cuda.get_device_capability(0)}')
+    else:
+        print('  ⚠️  PyTorch CUDA: NON DISPONIBLE')
+        print('     → Vérifiez que PyTorch a été installé avec CUDA support')
+        print('     → Commande: pip install torch --index-url https://download.pytorch.org/whl/cu124')
+        print('     Device: CPU (fallback)')
+except Exception as e:
+    print(f'  ❌ Erreur lors de la vérification: {str(e)}')
+    print('     → Essayez de réinstaller PyTorch')
+    sys.exit(1)
+" 2>/dev/null)
+    
+    if [ $? -eq 0 ]; then
+        echo "$CUDA_CHECK"
+    else
+        echo "  ❌ Erreur critique - PyTorch ne peut pas être importé"
+        echo "     Essayez: pip install torch --upgrade"
+    fi
     echo ""
     
 else

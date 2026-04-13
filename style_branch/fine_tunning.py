@@ -33,22 +33,28 @@ import sys
 import pandas as pd
 import numpy as np
 from typing import Dict, Any, List
+
+# ===== TORCH DEVICE DETECTION & CUDA FIX =====
+# Handle CUDA compatibility issues gracefully
+import torch
+
+# Import GPU utilities for robust device detection
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from gpu_utils import setup_training_device, print_device_info
+
+# ===== TRANSFORMERS IMPORTS =====
 from datasets import Dataset
 from transformers import AutoTokenizer, AutoModelForSequenceClassification, TrainingArguments, Trainer, EarlyStoppingCallback
 from scipy.special import softmax
 import evaluate
-import torch
 
-# Device detection: prioritize hardware acceleration
-if torch.backends.mps.is_available():
-    print("Apple Silicon (MPS) detected! Training will be hardware-accelerated.")
-    device: torch.device = torch.device("mps")
-elif torch.cuda.is_available():
-    print("Nvidia GPU detected! Training will be hardware-accelerated.")
-    device: torch.device = torch.device("cuda")
-else:
-    print("No hardware acceleration detected, using CPU. Training will be slow.")
-    device: torch.device = torch.device("cpu")
+# Get device and configure training
+DEVICE_OBJ = setup_training_device(verbose=False)
+DEVICE = str(DEVICE_OBJ)
+
+print_device_info("🚀 RoBERTa Fine-tuning Configuration")
+
+device: torch.device = torch.device(DEVICE)
 
 # Load stratified data splits
 print("Loading CSV files...")
@@ -144,7 +150,31 @@ trainer: Trainer = Trainer(
 )
 
 print("\nLaunching training...\n")
-trainer.train()
+try:
+    trainer.train()
+    print("\n✅ Training completed successfully.")
+except Exception as e:
+    print(f"\n⚠️  Training error encountered: {e}")
+    print("   Attempting graceful recovery...")
+    # Try training with reduced batch size if memory issues
+    if "memory" in str(e).lower() or "cuda" in str(e).lower():
+        print("   Detected memory/CUDA issue - retrying with CPU fallback...")
+        device = torch.device("cpu")
+        model.to(device)
+        training_args.per_device_train_batch_size = 4
+        training_args.per_device_eval_batch_size = 4
+        trainer = Trainer(
+            model=model,
+            args=training_args,
+            train_dataset=tokenized_A,
+            eval_dataset=tokenized_B,
+            processing_class=tokenizer,
+            compute_metrics=compute_metrics,
+            callbacks=[EarlyStoppingCallback(early_stopping_patience=5)]
+        )
+        trainer.train()
+    else:
+        raise  # Re-raise if not a memory/CUDA error
 
 print("\nTraining completed. Saving the model...")
 trainer.save_model("./roberta_fine_tunned")
