@@ -93,4 +93,12 @@ with open(results_dir / "strategy_5_stacked_rf_report.json", 'w') as f:
     json.dump(rf_report, f, indent=2)
 
 print(f"✅ Résultats sauvegardés: strategy_5_stacked_rf_report.json")
+
+# ===== OPTION A: SAUVEGARDER LE MODÈLE STACKED RF =====
+print("\n💾 Sauvegarde du modèle Stacked RandomForest...")
+model_path = results_dir / "stacked_rf_model.pkl"
+with open(model_path, 'wb') as f:
+    pickle.dump(stacked_rf.meta_model, f)
+print(f"✅ Modèle sauvegardé: {model_path}")
+print(f"   Taille: {model_path.stat().st_size / (1024*1024):.1f} MB")
 print("="*80)

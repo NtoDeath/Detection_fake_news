@@ -1,0 +1,8 @@
+Collecting xgboost
+  Using cached xgboost-3.2.0-py3-none-manylinux_2_28_x86_64.whl.metadata (2.1 kB)
+Requirement already satisfied: numpy in /var/data/python/lib/python3.13/site-packages (from xgboost) (2.4.3)
+Requirement already satisfied: nvidia-nccl-cu12 in /var/data/python/lib/python3.13/site-packages (from xgboost) (2.21.5)
+Requirement already satisfied: scipy in /var/data/python/lib/python3.13/site-packages (from xgboost) (1.17.1)
+Using cached xgboost-3.2.0-py3-none-manylinux_2_28_x86_64.whl (131.7 MB)
+Installing collected packages: xgboost
+Successfully installed xgboost-3.2.0
