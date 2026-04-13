@@ -1,0 +1,8 @@
+{
+  "strategy_name": "Cascading Style First",
+  "best_threshold": 0.5,
+  "accuracy": 0.4653502704062382,
+  "precision": 0.562157935887412,
+  "recall": 0.651464814255512,
+  "f1_score": 0.6035254616675993
+}

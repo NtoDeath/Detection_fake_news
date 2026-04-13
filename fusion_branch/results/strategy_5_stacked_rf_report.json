@@ -1,0 +1,15 @@
+{
+  "strategy_name": "Stacked RandomForest",
+  "model_type": "RandomForest (n_estimators=100, max_depth=5)",
+  "training_samples": 15902,
+  "accuracy": 0.7705948937240599,
+  "precision": 0.7350235584473861,
+  "recall": 0.9894291754756871,
+  "f1_score": 0.84346035015448,
+  "feature_importance": {
+    "style_pred": 0.1485356002766182,
+    "style_conf": 0.7909098518710352,
+    "knowledge_pred": 0.0008641033454014547,
+    "knowledge_conf": 0.059690444506945065
+  }
+}
