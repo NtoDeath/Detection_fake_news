@@ -10,8 +10,10 @@ import numpy as np
 import torch
 from pathlib import Path
 from typing import Dict, Tuple, Any, Optional
-from transformers import AutoTokenizer, AutoModelForSequenceClassification, pipeline
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
 from scipy.special import softmax
+from evidence_retrieval import EvidenceRetriever
+from claim_verification import ClaimVerifier
 
 
 class StyleDetectorWrapper:
@@ -98,55 +100,62 @@ class StyleDetectorWrapper:
 
 
 class KnowledgeDetectorWrapper:
-    """Lightweight Knowledge detector wrapper"""
+    """Knowledge-based fact-checking with evidence retrieval"""
     
     def __init__(self, models_dir: Path):
         self.models_dir = Path(models_dir)
-        self.nli_pipeline = None
+        self.evidence_retriever = None
+        self.claim_verifier = None
         self._load_models()
     
     def _load_models(self):
-        """Load DeBERTa NLI verifier"""
-        # DeBERTa loads from HuggingFace
-        self.nli_pipeline = pipeline(
-            "text-classification",
-            model="MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli",
-            device=0 if torch.cuda.is_available() else -1
-        )
+        """Load Evidence Retriever and Claim Verifier"""
+        # Initialize Evidence Retriever (Wikipedia + optional APIs)
+        self.evidence_retriever = EvidenceRetriever()
+        
+        # Initialize Claim Verifier
+        self.claim_verifier = ClaimVerifier()
     
     def predict(self, text: str) -> Dict[str, Any]:
         """
-        Check claim using knowledge base.
+        Verify a claim using external evidence.
         
         Returns:
             {
                 "verdict": "SUPPORTED" | "REFUTED" | "NOT_ENOUGH_INFO",
-                "confidence": float (0-1)
+                "confidence": float (0-1),
+                "evidence": str (source of evidence)
             }
         """
         if not text or len(text.strip()) < 10:
-            return {"verdict": "NOT_ENOUGH_INFO", "confidence": 0.0}
+            return {"verdict": "NOT_ENOUGH_INFO", "confidence": 0.0, "evidence": "Text too short"}
         
-        # Simplified: just use NLI pipeline on text itself (in production, retrieve evidence first)
         try:
-            # Create a dummy entailment check
-            result = self.nli_pipeline(text, truncation=True, max_length=512)[0]
-            label = result['label'].lower()
-            conf = result['score']
+            # 1. Retrieve evidence
+            evidence = self.evidence_retriever.get_evidence(text.strip(), language='en')
             
-            if "entail" in label:
-                verdict = "SUPPORTED"
-            elif "contradict" in label:
-                verdict = "REFUTED"
-            else:
-                verdict = "NOT_ENOUGH_INFO"
+            if not evidence or not evidence.get('content'):
+                return {
+                    "verdict": "NOT_ENOUGH_INFO",
+                    "confidence": 0.5,
+                    "evidence": "No evidence found"
+                }
+            
+            # 2. Verify claim against evidence
+            verdict, confidence = self.claim_verifier.verify(text, evidence['content'])
             
             return {
                 "verdict": verdict,
-                "confidence": float(conf)
+                "confidence": float(confidence),
+                "evidence": evidence.get('title', 'Unknown source')
             }
+            
         except Exception as e:
-            return {"verdict": "ERROR", "confidence": 0.0, "error": str(e)}
+            return {
+                "verdict": "NOT_ENOUGH_INFO",
+                "confidence": 0.0,
+                "evidence": f"Error: {str(e)}"
+            }
 
 
 class FusionFuzzyWrapper:

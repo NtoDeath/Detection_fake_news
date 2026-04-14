@@ -89,6 +89,7 @@ class FusionAnalyzer:
         
         knowledge_verdict = knowledge_result["verdict"]
         knowledge_conf = knowledge_result["confidence"]
+        knowledge_evidence = knowledge_result.get("evidence", "Unknown")
         
         verdict_emoji = {
             "SUPPORTED": "✓",
@@ -97,7 +98,8 @@ class FusionAnalyzer:
         }.get(knowledge_verdict, "❓")
         
         console.print(f"  Verdict: {verdict_emoji} {knowledge_verdict}")
-        console.print(f"  Confidence: {knowledge_conf:.1%}\n")
+        console.print(f"  Confidence: {knowledge_conf:.1%}")
+        console.print(f"  Evidence: {knowledge_evidence}\n")
         
         # FUSION
         console.print("[bold]🔗 FUSION Analysis[/bold]")
@@ -116,7 +118,7 @@ class FusionAnalyzer:
         
         return {
             "style": {"is_fake": style_result["is_fake"], "confidence": style_conf},
-            "knowledge": {"verdict": knowledge_verdict, "confidence": knowledge_conf},
+            "knowledge": {"verdict": knowledge_verdict, "confidence": knowledge_conf, "evidence": knowledge_evidence},
             "fusion": {"is_fake": is_fake_fusion, "confidence": conf_fusion}
         }
     
