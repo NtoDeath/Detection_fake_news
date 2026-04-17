@@ -218,6 +218,54 @@ Claim: "The moon landing was faked"
 
 ---
 
+## � Bug critique découvert: Pages "misinformation" inversent le verdict
+
+### Exemple concret
+```
+Claim: "5G towers cause COVID-19"
+Evidence Title: "5G misinformation"
+DeBERTa Input: "5G misinformation [SEP] 5G towers cause COVID-19"
+Result: ✓ SUPPORTED (99.6% confiance) ← INCORRECT!
+```
+
+### Le problème
+Wikipedia retourne les pages "X misinformation" quand on cherche "X causes Y".
+
+Exemple:
+- Cherche: "5G causes COVID"
+- Wikipedia retourne: "5G misinformation" (page qui DÉBUNKE, pas qui SOUTIENT)
+- DeBERTa reçoit: Juste le titre vide "5G misinformation"
+- Le modèle voit: "5G" vs "5G" = match = ENTAILMENT = SUPPORTED ✓ FAUX!
+
+### Contenu réel manquant
+Au lieu de recevoir:
+```
+"5G and COVID-19: There is no scientific link. 
+COVID-19 is caused by a virus (SARS-CoV-2), which spreads through 
+water droplets. 5G operates at radio frequencies and cannot transmit 
+diseases. Many studies have debunked this conspiracy theory..."
+```
+
+On reçoit juste:
+```
+"5G misinformation"
+```
+
+Résultat: DeBERTa ne peut pas comprendre que c'est une **réfutation**, pas un soutien.
+
+### Cas affectés
+- "Moon landing was faked" → trouve "Moon landing conspiracy theories" → NOT_ENOUGH_INFO (faux)
+- "COVID vaccines contain microchips" → trouve "Microchip conspiracy" page → peut inversion verdict
+- "Flat earth" → trouve "Flat earth theory" misinformation page → verdict confus
+
+### Solution rapide (à implémenter)
+Détecter les pages "misinformation/conspiracy/hoax/debunked" et:
+1. Soit les filtrer et relancer la recherche
+2. Soit inverser la logique du verdict
+3. Soit récupérer le contenu complet (et pas juste le titre) pour donner au modèle NLI du vrai contenu de débunking
+
+---
+
 ## 📝 Prochaines étapes recommandées
 
 Créer `evidence_retrieval_v2.py` avec:
@@ -230,12 +278,17 @@ class EvidenceRetrieverV2(EvidenceRetriever):
         self.content_min_length = 500  # Valider substantif
         self.content_max_length = 3000  # Augmenter de 1200
         self.cache = {}  # Cache simple
+        self.debunking_keywords = [
+            'misinformation', 'conspiracy', 'hoax', 'debunked', 
+            'false claim', 'unfounded', 'myth', 'pseudoscience'
+        ]
     
     def get_evidence(self, claim_text, language='en'):
         # 1. Wolfram (confiance 95%)
         # 2. Wikipedia enrichi (1200→3000 chars)
-        # 3. Entités + recherche
-        # 4. Google (confiance 60%)
-        # 5. Confidence scoring
+        # 3. Détecter pages "misinformation" et adapter la logique
+        # 4. Entités + recherche
+        # 5. Google (confiance 60%)
+        # 6. Confidence scoring
 ```
 
