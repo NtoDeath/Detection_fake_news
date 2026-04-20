@@ -20,6 +20,7 @@ roberta_fake_news/
 roberta_fake_news.zip
 roberta_fine_tunned/
 roberta_fine_tunned.zip
+roberta_fine_tunned 1.zip
 
 # Environnement
 .env/
@@ -35,6 +36,5 @@ knowledge_branch/train.jsonl
 knowledge_branch/splits/
 *.safetensors
 style_branch/roberta_fine_tunned/
-*.zip
 data/knowledge_based/train.jsonl
 data/splits/
