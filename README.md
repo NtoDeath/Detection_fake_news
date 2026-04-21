@@ -57,7 +57,8 @@ Le projet contient plusieurs branches :
    ├─ main.py                          [Entrée]
    ├─ model_loaders.py                 [Cœur]
    ├─ models/                          [Modèles déployés]
-   └─ setup.py                         [Déploiement]
+   ├─ setup.py                         [Déploiement]
+   └─ Detection_fake_news_CLI_Tool.zip [Archive zip de l'outil CLI (avec les models)]
 ```
 
 -----
